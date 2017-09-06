@@ -147,7 +147,8 @@ body {
 }
 
 .reveal h3 {
-  font-size: 1.3em; }
+  font-size: 5em;
+  text-transform: uppercase; }
 
 .reveal h4 {
   font-size: 1em; }

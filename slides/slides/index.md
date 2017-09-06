@@ -10,3 +10,43 @@
 ##  på rekordtid
 
 ***
+
+## Ingenting gir verdi før det er i produksjon
+### Kontinuerlige leveranser
+
+---
+
+## Nettskyen
+### Public Cloud
+
+---
+
+## PaaS og SaaS
+### Ikke finn opp hjulet på nytt
+
+---
+
+## Infrastructure-as-Code
+### Bruk og kast
+
+***
+
+## .NET Core
+### Moderne backendstack
+
+---
+
+## .NET vs Java
+### Hva er greia?
+
+***
+
+### DEMO
+
+***
+
+# Oppsummert
+
+* Cloud - Spesielt PaaS og SaaS
+* Infrastructure-as-code
+* .NET Core og ASP.NET Core

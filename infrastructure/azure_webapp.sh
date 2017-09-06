@@ -1,5 +1,8 @@
 #/bin/bash
 
+# Install Azure CLI 2.0: curl -L https://aka.ms/InstallAzureCli | bash
+# Login: az login
+
 # Variables
 resourceGroupName="miniseminaret2017"
 servicePlanName="AppServicePlan"
