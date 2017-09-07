@@ -38,7 +38,7 @@ namespace Web
             {
                 app.UseExceptionHandler("/Error");
             }
-
+            
             app.UseStaticFiles();
 
             app.UseMvc();
