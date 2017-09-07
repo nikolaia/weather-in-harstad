@@ -1,33 +1,42 @@
 #/bin/bash
 
+# > last_output.json
+
 # Install Azure CLI 2.0: curl -L https://aka.ms/InstallAzureCli | bash
 # Login: az login
 
-# Variables
-resourceGroupName="miniseminaret2017"
-servicePlanName="AppServicePlan"
-appName="ms17app"
-location="westeurope"
+# Replace the following URL with a public GitHub repo URL
+gitrepo=$(git config --get remote.origin.url)
+resourceGroupName=miniseminaret$RANDOM
+location=westeurope
+webappname=ms17app$RANDOM
 
-# Create a Resource Group
-az group create --name $resourceGroupName --location $location
+# Create a resource group.
+az group create --location $location --name $resourceGroupName
 
-# Create an App Service Plan
-az appservice plan create --name $servicePlanName --resource-group $resourceGroupName --location $location --is-linux --sku S1
+# Create an App Service plan in STANDARD tier (minimum required by deployment slots).
+az appservice plan create --name $webappname --resource-group $resourceGroupName --sku S1
 
-# Create a Web App
-az webapp create --name $appName --plan $servicePlanName --resource-group $resourceGroupName --is-linux
+# Create a web app.
+az webapp create --name $webappname --resource-group $resourceGroupName --plan $webappname
 
-# Create local-git source-control for the Web App
-az webapp deployment source config-local-git --name $appName --resource-group $resourceGroupName
+ #Create a deployment slot with the name "staging".
+az webapp deployment slot create --name $webappname --resource-group $resourceGroupName --slot staging
+
+# Deploy sample code to "staging" slot from GitHub.
+az webapp deployment source config --name $webappname --resource-group $resourceGroupName --slot staging --repo-url $gitrepo --branch master --manual-integration
 
 # Create a Postgres Server
-az postgres server create -l $location -g $resourceGroupName -n miniseminaret2017 -u miniseminaret2017 -p "8be7AzZuty*R9zdQMuPX2jfs&%Y22Z"
+az postgres server create -l $location -g $resourceGroupName -n $webappname -u $webappname -p "8be7AzZuty*R9zdQMuPX2jfs&%Y22Z"
 
-# git remote add azure https://@MyUniqueApp.scm.azurewebsites.net/MyUniqueApp.git
+# Browse to the deployed web app on staging. Deployment may be in progress, so rerun this if necessary.
+#az webapp browse --name $webappname --resource-group $resourceGroupName --slot staging
 
-# Configure Web App with a Custom Docker Container from Docker Hub
-# az webapp config container set --docker-custom-image-name $dockerHubContainerPath --name $appName --resource-group myResourceGroup
+# Swap the verified/warmed up staging slot into production.
+#az webapp deployment slot swap --name $webappname --resource-group $resourceGroupName --slot staging
+
+# Browse to the production slot.
+#az webapp browse --name $webappname --resource-group myResourceGroup
 
 # Clean up deployment
-# az group delete --name $resourceGroupName
+#az group delete --name $resourceGroupName
