@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MyLib;
+using Microsoft.Extensions.Logging;
 
-namespace Web
+namespace Weather.Web
 {
     public class Startup
     {
@@ -24,11 +24,10 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddEntityFrameworkNpgsql().AddDbContext<BloggingContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, BloggingContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -38,7 +37,7 @@ namespace Web
             {
                 app.UseExceptionHandler("/Error");
             }
-            
+
             app.UseStaticFiles();
 
             app.UseMvc();

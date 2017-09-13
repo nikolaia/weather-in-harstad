@@ -4,6 +4,9 @@ project.lock.json
 .DS_Store
 *.pyc
 
+# Project Rider
+.idea
+
 # Visual Studio Code
 .vscode
 

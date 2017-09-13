@@ -5,7 +5,7 @@
 # Install Azure CLI 2.0: curl -L https://aka.ms/InstallAzureCli | bash
 # Login: az login
 
-: ${DBPASS?"Need to set DBPASS"} # ex: 8be7AzZuty*R9zdQMuPX2jfs&%Y22Z
+# : ${DBPASS?"Need to set DBPASS"} # ex: 8be7AzZuty*R9zdQMuPX2jfs&%Y22Z
 
 gitrepo=$(git config --get remote.origin.url)
 resourceGroupName=miniseminaret$RANDOM
@@ -28,7 +28,7 @@ az webapp deployment slot create --name $webappname --resource-group $resourceGr
 az webapp deployment source config --name $webappname --resource-group $resourceGroupName --slot staging --repo-url $gitrepo --branch master --manual-integration
 
 # Create a Postgres Server
-az postgres server create -l $location -g $resourceGroupName -n $webappname -u $webappname -p $DBPASS
+#az postgres server create -l $location -g $resourceGroupName -n $webappname -u $webappname -p $DBPASS
 
 # Browse to the deployed web app on staging. Deployment may be in progress, so rerun this if necessary.
 #az webapp browse --name $webappname --resource-group $resourceGroupName --slot staging

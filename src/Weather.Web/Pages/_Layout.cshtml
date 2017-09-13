@@ -31,7 +31,6 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-page="/Index">Home</a></li>
-                    <li><a asp-page="/About">About</a></li>
                     <li><a asp-page="/Contact">Contact</a></li>
                 </ul>
             </div>
@@ -41,7 +40,13 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2017 - Web</p>
+            <p>Weather forecasts from: 
+                <ul>
+                    <li>Yr, delivered by the Norwegian Meteorological Institute and NRK</li>
+                    <li>StormGeo</li>
+                    <li>My grandpa</li>
+                </ul>
+            </p>
         </footer>
     </div>
 
