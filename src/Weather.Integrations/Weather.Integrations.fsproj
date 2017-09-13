@@ -14,7 +14,7 @@
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
   <PropertyGroup Condition="$(OS)=='Windows_NT'">
-    <FscToolPath>C:\Program Files (x86)\Microsoft SDKs\F#\4.0\Framework\v4.0</FscToolPath>
+    <FscToolPath>D:\Program Files (x86)\Microsoft SDKs\F#\4.0\Framework\v4.0</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
 </Project>
