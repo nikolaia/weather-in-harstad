@@ -9,8 +9,12 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="2.3.3" />
   </ItemGroup>
-  <PropertyGroup>
+   <PropertyGroup Condition="$(OS)=='Unix'">
     <FscToolPath>./tools</FscToolPath>
+    <FscToolExe>fsc.exe</FscToolExe>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(OS)=='Windows_NT'">
+    <FscToolPath>C:\Program Files (x86)\Microsoft SDKs\F#\4.1\Framework\v4.0</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
 </Project>
