@@ -29,6 +29,30 @@
 ## Infrastructure-as-Code
 ### Bruk og kast
 
+---
+
+```bash
+az group create --location $location --name $resourceGroupName
+
+# Create an App Service plan in STANDARD tier
+# (minimum required by deployment slots).
+az appservice plan create --name $webappname \
+    --resource-group $resourceGroupName --sku S1
+
+# Create a web app.
+az webapp create --name $webappname \
+    --resource-group $resourceGroupName --plan $webappname
+
+# Create a deployment slot with the name "staging".
+az webapp deployment slot create --name $webappname \
+    --resource-group $resourceGroupName --slot staging
+
+# Deploy sample code to "staging" slot from GitHub.
+az webapp deployment source config --name $webappname \
+    --resource-group $resourceGroupName --slot staging \
+    --repo-url $gitrepo --branch master --manual-integration
+```
+
 ***
 
 ## .NET Core
@@ -50,3 +74,7 @@
 * Cloud - Spesielt PaaS og SaaS
 * Infrastructure-as-code
 * .NET Core og ASP.NET Core
+
+---
+
+## github.com/nikolaia/miniseminar2017-dotnet
