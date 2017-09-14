@@ -1,22 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using Weather.Models;
 
 namespace Weather.Web.Pages
 {
     public class IndexModel : PageModel
     {
-        public string YrTemp { get; private set; }
-        public string StormTemp { get; private set; }
+
+        public IList<View.TempViewModel> Temperatures { get; set; }
 
         public async Task OnGet()
         {
-            this.YrTemp = await Weather.Integrations.Yr.GetForecastGvarv();
-            this.StormTemp = await Weather.Integrations.Storm.GetForecastGvarv("Harstad");
+            Temperatures = new List<View.TempViewModel>();
+            
+            // Get weather from Yr
+            var yr = await Weather.Integrations.Yr.GetForecastHarstad();
+            Temperatures.Add(new View.TempViewModel(Domain.TempProvider.Yr, yr.TempString));
+            
+            // Get weather from Storm
+            var storm = await Weather.Integrations.Storm.GetForecast("Harstad");
+            Temperatures.Add(new View.TempViewModel(Domain.TempProvider.Storm, storm.TempString));
+            
+            // Set bestefars opinion
+            Temperatures.Add(new View.TempViewModel(Domain.TempProvider.Bestefar, "Trist"));
         }
     }
 }

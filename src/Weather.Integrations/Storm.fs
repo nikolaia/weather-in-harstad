@@ -3,6 +3,7 @@ namespace Weather.Integrations
 module Storm =
 
     open FSharp.Data
+    open Weather.Models.Domain
 
     [<Literal>]
     let keySample = "{ \"Key\": \"/C+gqzCFnaDIuVdOktrUwmQql4U0VEQUu80hstkqNy8=\" }"
@@ -13,7 +14,7 @@ module Storm =
 
     let authUrl = "http://webapi.stormgeo.com/api/v1/keygen/k05ap8ng3k2" // key from github issue somewhere
 
-    let GetForecastGvarv locationQuery =
+    let GetForecast locationQuery =
         async {
         
             let! authKey = 
@@ -35,11 +36,12 @@ module Storm =
             
             let! forecast = StormForecast.AsyncLoad url_forecast
             
-            return
-                forecast.CurrentForecast
-                |> Seq.tryHead
-                |> function
-                    | Some f -> sprintf "%G" f.Temperature
-                    | None -> "-"
+            return {
+                Provider = Storm
+                Temp = forecast.CurrentForecast
+                       |> Seq.tryHead
+                       |> function
+                            | Some f -> Some f.Temperature
+                            | None -> None }
                 
         } |> Async.StartAsTask
