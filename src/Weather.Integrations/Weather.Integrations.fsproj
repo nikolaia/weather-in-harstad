@@ -13,6 +13,7 @@
   <ItemGroup> 
     <ProjectReference Include="..\Weather.Models\Weather.Models.fsproj" />
   </ItemGroup>
+  <!-- https://github.com/Microsoft/visualfsharp/issues/3303 -->
   <PropertyGroup Condition="$(OS)=='Unix'">
     <FscToolPath>../../tools</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
