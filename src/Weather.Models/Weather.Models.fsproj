@@ -14,7 +14,7 @@
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
   <PropertyGroup Condition="$(OS)=='Windows_NT'">
-    <FscToolPath>~/.nuget/packages/FSharp.Compiler.Tools/lib/net45/</FscToolPath>
+    <FscToolPath>$(HOMEDRIVE)$(HOMEPATH)/.nuget/packages/FSharp.Compiler.Tools/4.0.1.21/tools/</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
 </Project>
