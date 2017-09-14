@@ -7,9 +7,10 @@
     <Compile Include="Yr.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="FSharp.Compiler.Tools" Version="4.1.23" />
     <PackageReference Include="FSharp.Data" Version="2.3.3" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup> 
     <ProjectReference Include="..\Weather.Models\Weather.Models.fsproj" />
   </ItemGroup>
   <PropertyGroup Condition="$(OS)=='Unix'">
@@ -17,7 +18,7 @@
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
   <PropertyGroup Condition="$(OS)=='Windows_NT'">
-    <FscToolPath>D:\Program Files (x86)\Microsoft SDKs\F#\4.0\Framework\v4.0</FscToolPath>
+    <FscToolPath>$(FSharpSourcesRoot)</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
 </Project>
