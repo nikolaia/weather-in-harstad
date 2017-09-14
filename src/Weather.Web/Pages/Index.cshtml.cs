@@ -8,22 +8,16 @@ namespace Weather.Web.Pages
     public class IndexModel : PageModel
     {
 
-        public IList<View.TempViewModel> Temperatures { get; set; }
+        public IList<View.TempViewModel> Temperatures { get; private set; }
 
         public async Task OnGet()
         {
-            Temperatures = new List<View.TempViewModel>();
-            
-            // Get weather from Yr
-            var yr = await Weather.Integrations.Yr.GetForecastHarstad();
-            Temperatures.Add(new View.TempViewModel(Domain.TempProvider.Yr, yr.TempString));
-            
-            // Get weather from Storm
-            var storm = await Weather.Integrations.Storm.GetForecast("Harstad");
-            Temperatures.Add(new View.TempViewModel(Domain.TempProvider.Storm, storm.TempString));
-            
-            // Set bestefars opinion
-            Temperatures.Add(new View.TempViewModel(Domain.TempProvider.Bestefar, "Trist"));
+            Temperatures = new List<View.TempViewModel>
+            {
+                View.TempViewModel.Create(await Weather.Integrations.Yr.GetForecastHarstad()),
+                View.TempViewModel.Create(await Weather.Integrations.Storm.GetForecast("Harstad")),
+                new View.TempViewModel("Bestefar", "Trist")
+            };
         }
     }
 }

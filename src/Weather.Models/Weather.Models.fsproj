@@ -7,9 +7,8 @@
     <Compile Include="View.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Compiler.Tools" Version="4.1.23" />
+    <PackageReference Include="FSharp.Compiler.Tools" Version="4.0.1.21" />
   </ItemGroup>
-  <!-- https://github.com/Microsoft/visualfsharp/issues/3303 -->
   <PropertyGroup Condition="$(OS)=='Unix'">
     <FscToolPath>../../tools</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
