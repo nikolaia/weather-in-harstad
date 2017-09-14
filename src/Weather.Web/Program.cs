@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.Elasticsearch;
 
 namespace Weather.Web
 {
@@ -25,7 +26,12 @@ namespace Weather.Web
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithEnvironmentUserName()
                 .WriteTo.Console()
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://miniseminar:miniseminar2017@portal360-8.intrepid-elastic-search-39.nikolaia.composedb.com:17343/") ){
+                        AutoRegisterTemplate = true,
+                })
                 .CreateLogger();
 
             try
