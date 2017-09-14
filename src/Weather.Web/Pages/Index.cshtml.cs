@@ -28,7 +28,7 @@ namespace Weather.Web.Pages
             {
                 View.TempViewModel.Create(yr),
                 View.TempViewModel.Create(storm),
-                new View.TempViewModel("Bestefar", "Trist")
+                new View.TempViewModel("Bestefar", "Pent")
             };
             
             Log.Information("Temperatures are @{Temperatures}", Temperatures);
