@@ -25,6 +25,7 @@ namespace Weather.Web
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
+                .Enrich.WithProperty("http_host", configuration.GetValue<string>("HTTP_HOST"))
                 .WriteTo.Console()
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(esConnection) ){
                         AutoRegisterTemplate = true,
