@@ -17,7 +17,7 @@ namespace Weather.Web
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
                 .Build();
 
-            var esConnection = configuration.GetValue("ConnectionStrings:Elasticsearch", "https://localhost:9200");
+            var esConnection = configuration.GetConnectionString("Elasticsearch");
             
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
