@@ -55,13 +55,95 @@ az webapp deployment source config --name $webappname \
 
 ***
 
+## .NET vs Java
+### Hva er greia?
+
+---
+
 ## .NET Core
 ### Moderne backendstack
 
 ---
 
-## .NET vs Java
-### Hva er greia?
+```bash
+$ dotnet new web --output src/Web
+$ cd src/Web
+$ dotnet run
+Hosting environment: Development
+Content root path: /Users/nikolaia/Development/hobbybackend/src/Web
+Now listening on: http://localhost:5000
+Application started. Press Ctrl+C to shut down.
+```
+
+---
+
+```bash
+Program.cs
+Startup.cs
+Web.csproj
+bin
+obj
+wwwroot
+```
+
+---
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>
+```
+
+---
+
+```csharp
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        WebHost.CreateDefaultBuilder(args)
+            .UseStartup<Startup>()
+            .Build()
+            .Run();
+    }
+}
+```
+
+---
+
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+    }
+
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
+        app.Run(async (context) =>
+        {
+            await context.Response.WriteAsync("Hello World!");
+        });
+    }
+}
+```
 
 ***
 
@@ -77,4 +159,4 @@ az webapp deployment source config --name $webappname \
 
 ---
 
-## github.com/nikolaia/miniseminar2017-dotnet
+## github.com/nikolaia/hobbybackend
