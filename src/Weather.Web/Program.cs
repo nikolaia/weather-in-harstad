@@ -17,13 +17,15 @@ namespace Weather.Web
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
                 .Build();
 
+            var esConnection = configuration.GetValue("ConnectionStrings:Elasticsearch", "https://localhost:9200");
+            
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
                 .WriteTo.Console()
-                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://miniseminar:miniseminar2017@portal360-8.intrepid-elastic-search-39.nikolaia.composedb.com:17343/") ){
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(esConnection) ){
                         AutoRegisterTemplate = true,
                 })
                 .CreateLogger();
