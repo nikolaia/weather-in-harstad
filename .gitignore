@@ -33,3 +33,5 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+infrastructure/last_output.json

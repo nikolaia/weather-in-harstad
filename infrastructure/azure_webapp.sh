@@ -27,6 +27,9 @@ az webapp deployment slot create --name $webappname --resource-group $resourceGr
 # Deploy sample code to "staging" slot from GitHub.
 az webapp deployment source config --name $webappname --resource-group $resourceGroupName --slot staging --repo-url $gitrepo --branch master --manual-integration
 
+
+# MORE SNACKS:
+
 # Create a Postgres Server
 #az postgres server create -l $location -g $resourceGroupName -n $webappname -u $webappname -p $DBPASS
 
