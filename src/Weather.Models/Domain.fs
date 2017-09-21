@@ -6,6 +6,12 @@ module Domain =
     | Yr
     | Storm
     | Bestefar
+    with
+        member this.ProviderString =
+            match this with
+            | Yr -> "Yr"
+            | Storm -> "Storm"
+            | Bestefar -> "Bestefar"
     
     type Temp = {
         Provider : TempProvider

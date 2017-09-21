@@ -9,20 +9,19 @@ namespace Weather.Web.Pages
 {
     public class IndexModel : PageModel
     {
-
         public IList<View.TempViewModel> Temperatures { get; private set; }
 
         public async Task OnGet()
         {
             Log.Information("Someone is attempting to fetch the weather for Harstad");
             
-            var logtemplate = "{provider} is {temperature} degrees";
+            const string logtemplate = "{provider} says {temperature} degrees";
             
             var yr = await Weather.Integrations.Yr.GetForecastHarstad();
-            Log.Information(logtemplate, yr.Provider, yr.TempString);
+            Log.Information(logtemplate, yr.Provider.ProviderString, yr.TempString);
             
             var storm = await Weather.Integrations.Storm.GetForecast("Harstad");
-            Log.Information(logtemplate, storm.Provider, storm.TempString);
+            Log.Information(logtemplate, storm.Provider.ProviderString, storm.TempString);
             
             Temperatures = new List<View.TempViewModel>
             {
