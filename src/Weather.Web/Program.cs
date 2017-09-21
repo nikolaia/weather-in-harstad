@@ -19,13 +19,14 @@ namespace Weather.Web
                 .Build();
 
             var esConnection = configuration.GetConnectionString("Elasticsearch");
+            var httpHost = System.Environment.GetEnvironmentVariable("HTTP_HOST") ?? "localhost";
             
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
-                .Enrich.WithProperty("http_host", configuration.GetValue<string>("HTTP_HOST"))
+                .Enrich.WithProperty("http_host", httpHost)
                 .WriteTo.Console()
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(esConnection) ){
                         AutoRegisterTemplate = true,
