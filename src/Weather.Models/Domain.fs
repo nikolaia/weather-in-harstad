@@ -19,5 +19,5 @@ module Domain =
     } with 
         member this.TempString = 
             match this.Temp with
-            | Some t -> sprintf "%G" t
+            | Some t -> sprintf "%G°" t
             | None -> "-"
