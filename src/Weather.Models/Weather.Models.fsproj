@@ -1,20 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Domain.fs" />
     <Compile Include="View.fs" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="FSharp.Compiler.Tools" Version="4.0.1.21" />
-  </ItemGroup>
-  <PropertyGroup Condition="$(OS)=='Unix'">
-    <FscToolPath>../../tools</FscToolPath>
-    <FscToolExe>fsc.exe</FscToolExe>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(OS)=='Windows_NT'">
-    <FscToolPath>$(HOMEDRIVE)$(HOMEPATH)/.nuget/packages/FSharp.Compiler.Tools/4.0.1.21/tools/</FscToolPath>
-    <FscToolExe>fsc.exe</FscToolExe>
-  </PropertyGroup>
 </Project>
