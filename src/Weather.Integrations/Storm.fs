@@ -31,10 +31,10 @@ module Storm =
                 |> Seq.head
                 |> fun place -> place.PlaceId
             
-            let url_forecast =
+            let urlForecast =
                 sprintf "http://webapi.stormgeo.com/api/v1/now-forecast/%i?auth=%s" id urlEncodedKey
             
-            let! forecast = StormForecast.AsyncLoad url_forecast
+            let! forecast = StormForecast.AsyncLoad urlForecast
             
             return {
                 Provider = Storm
