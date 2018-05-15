@@ -34,4 +34,8 @@ msbuild.wrn
 # Visual Studio 2015
 .vs/
 
-infrastructure/last_output.json
+[Pp]ackages/
+[Pp]aket-files/
+.fake/
+.paket/
+artifacts/

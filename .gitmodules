@@ -1,3 +1,0 @@
-[submodule "deploy"]
-	path = deploy
-	url = https://github.com/nikolaia/fake-webapp-deploy.git
