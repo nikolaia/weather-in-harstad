@@ -1,1 +1,1 @@
-powershell -file "upload.ps1" -appName %*
+powershell -file "upload.ps1" %*

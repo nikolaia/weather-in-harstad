@@ -1,34 +1,27 @@
 Param(
     [Parameter(Mandatory=$True,Position=1)]
-    [string]$appName
+    [string]$appName,
+
+    [Parameter(Mandatory=$True,Position=2)]
+    [string]$parameterSet
   )
+  
+$parameters = "infrastructure/parameters/$parameterSet.parameters.json"
+if (-Not (Test-Path $parameters -PathType Leaf)) { 
+    Write-Error "Unable to find parameter file for provided parameterSet '$appName' ($parameters)"
+    exit 1 
+}
 
-# VALIDATE
+if ((az group list --query "[?name=='$appName']") -eq "[]") {
+    az group create --location westeurope --name $appName --tag CreatedBy="Nikolai Norman Andersen"
+}
 
-#az group deployment validate -g MyApp.Dev --template-file "arm/azuredeploy.json" --parameters @arm/parameters/dev.parameters.json --query 'properties.provisioningState'
-#az group deployment validate -g MyApp.Test --template-file "arm/azuredeploy.json" --parameters @arm/parameters/test.parameters.json --query 'properties.provisioningState'
-#az group deployment validate -g MyApp --template-file "arm/azuredeploy.json" --parameters @arm/parameters/production.parameters.json --query 'properties.provisioningState'
+$provisioning = az group deployment create -g $appName --template-file 'infrastructure/azuredeploy.json' --parameters $parameters --parameters webAppName=$appName --query 'properties.provisioningState'
+if ([string]$provisioning -ne '"Succeeded"') { Write-Error "ARM Template deployment failed"; exit 1 }
 
-# TEMPLATE DEPLOY
+# Naive locating so it works both on the BuildServer and on the local machine:
+$zip = Get-ChildItem -Path .\ -recurse -Filter *.zip | Select-Object -First 1 | % { $_.FullName } 
+Write-Host "Deploying $zip"
 
-# az group deployment create -g MyApp.Test --template-file "arm/azuredeploy.json" --parameters @arm/parameters/dev.parameters.json
-
-# ZIP DEPLOY APP
-
-$token = (ConvertFrom-Json -InputObject ([string](Invoke-Expression -Command:"az account get-access-token")))."accessToken"
-$bearerToken = "Bearer $token"
-$apiUrl = "https://$appName.scm.azurewebsites.net/api/zipdeploy"
-
-$vstsWorkDir = $env:SYSTEM_DEFAULTWORKINGDIRECTORY
-$vstsReleaseDefName = $env:RELEASE_DEFINITIONNAME
-
-$artifactDir = if ($vstsWorkDir -and $vstsReleaseDefName) { 
-        "$($env:SYSTEM_DEFAULTWORKINGDIRECTORY)/$($env:RELEASE_DEFINITIONNAME)/drop"
-    } else { 
-        split-path -parent $MyInvocation.MyCommand.Definition
-    }
-
-$zip = Get-ChildItem -Path $artifactDir -Filter *.zip | Select-Object -First 1
-$zipPath = "$artifactDir/$($zip.Name)"
-Write-Host "Calling $apiUrl with $zipPath using token '$bearerToken'"
-Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=$bearerToken} -Method POST -InFile $zipPath -ContentType "multipart/form-data"
+$deploy = az webapp deployment source config-zip -g $appName -n $appName --src $zip --query "status"
+if ([string]$deploy -ne '4') { Write-Error "Deployment Failed"; exit 1 } # status 4 = success - status 3 = failed
