@@ -25,3 +25,6 @@ Write-Host "Deploying $zip"
 
 $deploy = az webapp deployment source config-zip -g $appName -n $appName --src $zip --query "status"
 if ([string]$deploy -ne '4') { Write-Error "Deployment Failed"; exit 1 } # status 4 = success - status 3 = failed
+
+Write-Host "Success"
+exit 0
