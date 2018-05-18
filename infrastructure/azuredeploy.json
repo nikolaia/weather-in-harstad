@@ -1,46 +1,84 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "$schema":
+    "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "webAppName": {
-          "type": "string",
-          "metadata": {
-              "description": "The name of the web app that you wish to create."
-          }
+    "webAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the web app that you wish to create."
       }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the vault"
+      }
+    }
   },
-  "variables": {        
-      "appServicePlanName": "[concat(parameters('webAppName'),'-asp-', uniquestring(resourceGroup().id))]"
+  "variables": {
+    "appServicePlanName":
+      "[concat(parameters('webAppName'),'-asp-', uniquestring(resourceGroup().id))]"
   },
   "resources": [
-      {
-          "apiVersion": "2016-03-01",
-          "name": "[variables('appServicePlanName')]",
-          "type": "Microsoft.Web/serverfarms",
-          "location": "[resourceGroup().location]",
-          "properties": {
-              "name": "[variables('appServicePlanName')]"
-          },
-          "sku": {
-              "name" : "S1",
-              "tier": "Standard",
-              "size": "1",
-              "family": "S",
-              "capacity": "1"
-          }
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[variables('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[variables('appServicePlanName')]"
       },
-      {
-          "apiVersion": "2016-03-01",
-          "name": "[parameters('webAppName')]",
-          "type": "Microsoft.Web/sites",
-          "location": "[resourceGroup().location]",
-          "properties": {
-              "name": "[parameters('webAppName')]",
-              "serverFarmId": "[resourceId('Microsoft.Web/serverFarms',variables('appServicePlanName'))]"
-          },
-          "dependsOn": [
-              "[concat('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]"
-          ]
+      "sku": {
+        "name": "S1",
+        "tier": "Standard",
+        "size": "1",
+        "family": "S",
+        "capacity": 1
       }
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[parameters('webAppName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "name": "[parameters('webAppName')]",
+        "serverFarmId":
+          "[resourceId('Microsoft.Web/serverFarms',variables('appServicePlanName'))]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[parameters('keyVaultName')]",
+      "apiVersion": "2015-06-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "tenantId":
+          "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
+        "accessPolicies": [
+          {
+            "tenantId":
+              "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
+            "objectId":
+              "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": ["all"],
+              "secrets": ["all"]
+            }
+          }
+        ]
+      }
+    }
   ]
 }

@@ -3,7 +3,10 @@
     "contentVersion":"1.0.0.0",
     "parameters":{
        "webAppName":{
-          "value":"weather-in-harstad-t1"
+          "value":"weather-in-harstad"
+       },
+       "keyVaultName":{
+          "value":"weather-in-harstad-kv"
        }
     }
  }
