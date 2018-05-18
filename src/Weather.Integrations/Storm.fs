@@ -6,6 +6,7 @@ module Storm =
     open Weather.Models.Domain
 
     [<Literal>]
+    // TODO: Fetch from KeyVault with MSI
     let keySample = "{ \"Key\": \"/C+gqzCFnaDIuVdOktrUwmQql4U0VEQUu80hstkqNy8=\" }"
         
     type StormKey = JsonProvider<keySample>
