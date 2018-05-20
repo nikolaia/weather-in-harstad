@@ -32,7 +32,7 @@ msbuild.err
 msbuild.wrn
 
 # Visual Studio 2015
-.vs/
+.vs//
 
 [Pp]ackages/
 [Pp]aket-files/

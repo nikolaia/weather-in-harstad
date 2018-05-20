@@ -1,4 +1,7 @@
 namespace Weather.Integrations
+open Microsoft.Azure.Services.AppAuthentication
+open Microsoft.Azure.KeyVault.WebKey
+open Microsoft.Azure.KeyVault
 
 module Storm =
 
@@ -6,20 +9,22 @@ module Storm =
     open Weather.Models.Domain
 
     [<Literal>]
-    // TODO: Fetch from KeyVault with MSI
-    let keySample = "{ \"Key\": \"/C+gqzCFnaDIuVdOktrUwmQql4U0VEQUu80hstkqNy8=\" }"
+    let KeySample = "{ \"Key\": \"/C+gxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=\" }"
         
-    type StormKey = JsonProvider<keySample>
+    type StormKey = JsonProvider<KeySample>
     type StormPlaces = JsonProvider<"./samples/storm_places.json">
     type StormForecast = JsonProvider<"./samples/storm_now-forecast.json">
-
-    let authUrl = "http://webapi.stormgeo.com/api/v1/keygen/k05ap8ng3k2" // key from github issue somewhere
-
-    let GetForecast locationQuery =
+    let GetForecast locationQuery stormSecretUri =
         async {
-        
+            
+            let kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(fun _ resource _ -> 
+                let azureServiceTokenProvider = new AzureServiceTokenProvider();
+                azureServiceTokenProvider.GetAccessTokenAsync(resource)))
+                
+            let! authUrlSecret = kv.GetSecretAsync(stormSecretUri) |> Async.AwaitTask
+
             let! authKey = 
-                StormKey.AsyncLoad(authUrl)
+                StormKey.AsyncLoad(authUrlSecret.Value)
             
             let urlEncodedKey = authKey.Key |> System.Net.WebUtility.UrlEncode
             

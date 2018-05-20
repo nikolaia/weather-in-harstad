@@ -37,7 +37,8 @@ Target.create "Clean" <| fun _ ->
 Target.create "Build" <| fun _ ->
     let install = lazy DotNet.install DotNet.Release_2_1_4
     let inline dotnetSimple arg = DotNet.Options.lift install.Value arg 
-    DotNet.publish (fun opt -> { opt with Runtime = Some "win10-x64" ; OutputPath = Some buildDir } |> dotnetSimple) sln
+    DotNet.publish (fun opt -> { opt with Runtime = Some "win10-x64"
+                                          OutputPath = Some buildDir } |> dotnetSimple) sln
 
 // Zip the 'build' folder and place the zip in the 'artifacts' folder together with the
 // ARM-templates and the upload scripts.

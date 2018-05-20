@@ -29,5 +29,11 @@ if ([string]$deploy -ne '4') { Write-Error "Deployment Failed"; exit 1 } # statu
 
 # TODO: Run populate-keyvault.azcli if it exists
 
-Write-Host "Success"
+Write-Host "Deploy Success"
+
+$secrets = "infrastructure/populate-keyvault.azcli"
+if (Test-Path $secrets -PathType Leaf) { 
+    Write-Error "Found '$secrets'. Running"
+    powershell -noexit "& $secrets"
+}
 exit 0

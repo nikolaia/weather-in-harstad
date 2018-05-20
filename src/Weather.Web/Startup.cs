@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Weather.Web.Options;
 
 namespace Weather.Web
 {
@@ -23,6 +24,7 @@ namespace Weather.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<WeatherOptions>(Configuration.GetSection("Weather"));
             services.AddMemoryCache();
             services.AddMvc();
         }

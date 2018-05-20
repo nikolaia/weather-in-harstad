@@ -50,6 +50,22 @@
         "serverFarmId":
           "[resourceId('Microsoft.Web/serverFarms',variables('appServicePlanName'))]"
       },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+          ],
+          "name": "appsettings",
+          "properties": {
+            "StormSecretUrl": ""
+          },
+          "tags": {
+            "displayName": "appSettings"
+          },
+          "type": "config"
+        }
+      ],
       "dependsOn": [
         "[concat('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]"
       ]
