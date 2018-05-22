@@ -9,14 +9,17 @@
         "description": "The name of the web app that you wish to create."
       }
     },
-    "keyVaultName": {
+    "serilogLogLevel": {
       "type": "string",
       "metadata": {
-        "description": "Name of the vault"
+        "description": "The minimum loglevel for Serilog to push"
       }
     }
   },
   "variables": {
+    "keyVaultName": "[concat(parameters('webAppName'),'-kv-', uniquestring(resourceGroup().id))]",
+    "sqlServerName": "[concat(parameters('webAppName'),'-sql-', uniquestring(resourceGroup().id))]",
+    "sqlDatabaseName": "",
     "appServicePlanName":
       "[concat(parameters('webAppName'),'-asp-', uniquestring(resourceGroup().id))]"
   },
@@ -58,7 +61,8 @@
           ],
           "name": "appsettings",
           "properties": {
-            "StormSecretUrl": ""
+            "StormSecretUrl": "",
+            "Serilog:MinimumLevel:Default": "[parameters('serilogLogLevel')]"
           },
           "tags": {
             "displayName": "appSettings"
@@ -67,14 +71,74 @@
         }
       ],
       "dependsOn": [
-        "[concat('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]"
+        "[concat('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]",
+        "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+      ]
+    },
+    {
+      "name": "[variables('sqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "SQL Server"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "[variables('sqlDatabaseName')]",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+          ],
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "edition": "Standard",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "S0"
+          }
+        },
+        {
+          "type": "administrators",
+          "name": "activeDirectory",
+          "apiVersion": "2014-04-01-preview",
+          "location": "[resourceGroup().location]",
+          "properties": {
+              "administratorType": "ActiveDirectory",
+              "login": "[parameters('webAppName')]",
+              "sid": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
+              "tenantId": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]"
+          },
+          "dependsOn": [
+              "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]",
+              "[concat('Microsoft.Web/sites', parameters('webAppName'))]"
+          ]
+        }
       ]
     },
     {
       "type": "Microsoft.KeyVault/vaults",
-      "name": "[parameters('keyVaultName')]",
+      "name": "[variables('keyVaultName')]",
       "apiVersion": "2015-06-01",
       "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Web/sites', parameters('webAppName'))]"
+      ],
       "properties": {
         "sku": {
           "name": "standard",

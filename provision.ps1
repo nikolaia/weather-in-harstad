@@ -34,4 +34,10 @@ if (Test-Path $secrets -PathType Leaf) {
     Write-Error "Found '$secrets'. Running"
     powershell -noexit "& $secrets"
 }
+
+
+# Smoketest (webappurl/api/health)
+
+# az webapp deployment slot swap -g $appName -n $appName --slot staging --target-slot production
+
 exit 0
