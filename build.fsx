@@ -52,8 +52,8 @@ Target.create "Artifact" <| fun _ ->
     Directory.ensure artifactDirArm
     Shell.copyDir artifactDirArm "infrastructure" (fun _ -> true)
 
-    Shell.copyFile artifactDir "upload.cmd"
-    Shell.copyFile artifactDir "upload.ps1"
+    Shell.copyFile artifactDir "provision.cmd"
+    Shell.copyFile artifactDir "provision.ps1"
 
 "Clean"
     ==> "Build"
