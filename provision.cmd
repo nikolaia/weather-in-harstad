@@ -1,1 +1,1 @@
-powershell -file "upload.ps1" %*
+powershell -file "provision.ps1" %*

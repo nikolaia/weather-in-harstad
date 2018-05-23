@@ -29,12 +29,11 @@ if ([string]$deploy -ne '4') { Write-Error "Deployment Failed"; exit 1 } # statu
 
 Write-Host "Deploy Success"
 
-$secrets = "infrastructure/populate-keyvault.azcli"
-if (Test-Path $secrets -PathType Leaf) { 
-    Write-Error "Found '$secrets'. Running"
-    powershell -noexit "& $secrets"
-}
-
+#$secrets = "infrastructure/populate-keyvault.azcli"
+#if (Test-Path $secrets -PathType Leaf) { 
+#    Write-Error "Found '$secrets'. Running"
+#    powershell -noexit "& $secrets"
+#}
 
 # Smoketest (webappurl/api/health)
 

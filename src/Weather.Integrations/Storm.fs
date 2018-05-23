@@ -1,7 +1,7 @@
 namespace Weather.Integrations
 open Microsoft.Azure.Services.AppAuthentication
-open Microsoft.Azure.KeyVault.WebKey
 open Microsoft.Azure.KeyVault
+open Serilog
 
 module Storm =
 
@@ -14,13 +14,15 @@ module Storm =
     type StormKey = JsonProvider<KeySample>
     type StormPlaces = JsonProvider<"./samples/storm_places.json">
     type StormForecast = JsonProvider<"./samples/storm_now-forecast.json">
-    let GetForecast locationQuery stormSecretUri =
+    let GetForecast locationQuery (stormSecretUri : string) =
         async {
             
             let kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(fun _ resource _ -> 
                 let azureServiceTokenProvider = new AzureServiceTokenProvider();
                 azureServiceTokenProvider.GetAccessTokenAsync(resource)))
-                
+
+            Log.Information("Fetching {stormSecretUri} with MSI token", stormSecretUri)
+
             let! authUrlSecret = kv.GetSecretAsync(stormSecretUri) |> Async.AwaitTask
 
             let! authKey = 

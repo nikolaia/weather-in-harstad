@@ -15,13 +15,16 @@
         "description": "The minimum loglevel for Serilog to push"
       }
     }
-  },
+  }, 
   "variables": {
-    "keyVaultName": "[concat(parameters('webAppName'),'-kv-', uniquestring(resourceGroup().id))]",
-    "sqlServerName": "[concat(parameters('webAppName'),'-sql-', uniquestring(resourceGroup().id))]",
-    "sqlDatabaseName": "",
-    "appServicePlanName":
-      "[concat(parameters('webAppName'),'-asp-', uniquestring(resourceGroup().id))]"
+    "appNameShort": "[substring(parameters('webAppName'),0,5)]",
+    "keyVaultName": "[concat(variables('appNameShort'),'-kv-', uniquestring(resourceGroup().id))]",
+    "sqlServerName": "[concat(variables('appNameShort'),'-sql-', uniquestring(resourceGroup().id))]",
+    "sqlDatabaseName": "[concat(variables('appNameShort'),'-db-', uniquestring(resourceGroup().id))]",
+    "sqlDatabaseAdminName": "weatherinharstad",
+    "appServicePlanName": "[concat(variables('appNameshort'),'-asp-', uniquestring(resourceGroup().id))]",
+    "sqlserverAdminLogin": "[concat('l', uniqueString(resourceGroup().id, '9A08DDB9-95A1-495F-9263-D89738ED4205'))]",
+    "sqlserverAdminPassword": "[concat('P', uniqueString(resourceGroup().id, '224F5A8B-51DB-46A3-A7C8-59B0DD584A41'), 'x', '!')]"
   },
   "resources": [
     {
@@ -61,18 +64,32 @@
           ],
           "name": "appsettings",
           "properties": {
-            "StormSecretUrl": "",
+            "StormSecretUri": "",
             "Serilog:MinimumLevel:Default": "[parameters('serilogLogLevel')]"
           },
           "tags": {
             "displayName": "appSettings"
           },
           "type": "config"
-        }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+          ],
+          "name": "connectionstrings",
+          "properties": {
+            "WeatherSqlDb": {
+              "type": "SQLAzure",
+              "value": "[concat('Data Source=', variables('sqlDatabaseName'), '.database.windows.net,1433;Database=', variables('sqlDatabaseName'))]"
+            }
+          },
+          "type": "config"
+        } 
       ],
       "dependsOn": [
-        "[concat('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]",
-        "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+        "[resourceId('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]",
+        "[resourceId('Microsoft.Sql/servers/', variables('sqlServerName'))]"
       ]
     },
     {
@@ -80,6 +97,10 @@
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[variables('sqlserverAdminLogin')]",
+        "administratorLoginPassword": "[variables('sqlserverAdminPassword')]"
+      }, 
       "dependsOn": [],
       "tags": {
         "displayName": "SQL Server"
@@ -120,13 +141,13 @@
           "location": "[resourceGroup().location]",
           "properties": {
               "administratorType": "ActiveDirectory",
-              "login": "[parameters('webAppName')]",
+              "login": "[variables('sqlDatabaseAdminName')]",
               "sid": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
               "tenantId": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]"
           },
           "dependsOn": [
               "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]",
-              "[concat('Microsoft.Web/sites', parameters('webAppName'))]"
+              "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
           ]
         }
       ]
@@ -137,7 +158,7 @@
       "apiVersion": "2015-06-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Web/sites', parameters('webAppName'))]"
+        "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
       ],
       "properties": {
         "sku": {

@@ -39,6 +39,8 @@ msbuild.wrn
 .fake/
 .paket/
 artifacts/
+node_modules/
 
 # git-secret
 infrastructure/populate-keyvault.azcli
+

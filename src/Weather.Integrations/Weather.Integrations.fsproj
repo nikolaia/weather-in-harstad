@@ -11,6 +11,7 @@
     <PackageReference Include="FSharp.Data" Version="3.0.0-beta3" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.1" />
+    <PackageReference Include="Serilog" Version="2.7.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Weather.Models\Weather.Models.fsproj" />
