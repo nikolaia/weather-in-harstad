@@ -1,1 +1,0 @@
-powershell -file "provision.ps1" %*
