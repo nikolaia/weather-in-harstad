@@ -8,5 +8,5 @@ Install Azure CLI 2.0+, run `az login` and make sure you are on the correct subs
 
 ```powershell
 .\build.cmd Artifact
-.\upload.cmd -appName <WebAppNameYouWantTheAppToHave> -parameterSet test
+.\provision.cmd -appName <WebAppNameYouWantTheAppToHave> -parameterSet test
 ```
