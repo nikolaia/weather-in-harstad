@@ -45,19 +45,17 @@ Target.create "Build" <| fun _ ->
 Target.create "Artifact" <| fun _ ->
     let artifactFilename = sprintf "%s/%s.%s.zip" artifactDir appName version
 
-    Shell.copyFile buildDir "Tools.csproj"
     !! "./deploy/*.*" |> Shell.copyFiles buildDir
-
     !! "./build/**/*.*" |> Zip.zip buildDir artifactFilename
 
+    let 
     let artifactDirArm = (artifactDir + "/infrastructure/")
     Directory.ensure artifactDirArm
     Shell.copyDir artifactDirArm "infrastructure" (fun f -> not <| f.EndsWith(".azcli"))
-    Shell.copyFile artifactDir "provision.cmd"
     Shell.copyFile artifactDir "provision.ps1"
 
 "Clean"
     ==> "Build"
     ==> "Artifact"
 
-Target.runOrDefault "Build"
+Target.runOrDefault "Artifact"
