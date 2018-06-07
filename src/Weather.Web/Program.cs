@@ -3,7 +3,6 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Sinks.Elasticsearch;
 
 namespace Weather.Web
 {
@@ -19,20 +18,26 @@ namespace Weather.Web
                 .AddEnvironmentVariables()
                 .Build();
 
-            var esConnection = configuration.GetConnectionString("Elasticsearch");
-            var httpHost = System.Environment.GetEnvironmentVariable("HTTP_HOST") ?? "localhost";
+            var httpHost = System.Environment.GetEnvironmentVariable("HTTP_HOST");
             
-            Log.Logger = new LoggerConfiguration()
+            var logConfiguration = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
-                .Enrich.WithProperty("http_host", httpHost)
-                .WriteTo.Console()
-                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(esConnection) ){
-                        AutoRegisterTemplate = true,
-                })
-                .CreateLogger();
+                .Enrich.WithProperty("http_host", httpHost ?? "localhost")
+                .WriteTo.Console();
+
+            if (httpHost != null && httpHost.EndsWith(".azurewebsites.net")) {
+                logConfiguration.WriteTo.File(
+                    @"D:\home\LogFiles\http\RawLogs\log.txt",
+                    fileSizeLimitBytes: 1_000_000,
+                    rollOnFileSizeLimit: true,
+                    shared: true,
+                    flushToDiskInterval: TimeSpan.FromSeconds(1));
+            }
+            
+            Log.Logger = logConfiguration.CreateLogger();
 
             try
             {

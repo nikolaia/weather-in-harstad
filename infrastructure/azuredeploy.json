@@ -64,7 +64,7 @@
           ],
           "name": "appsettings",
           "properties": {
-            "StormSecretUri": "",
+            "Weather:StormSecretUri": "",
             "Serilog:MinimumLevel:Default": "[parameters('serilogLogLevel')]"
           },
           "tags": {
@@ -177,6 +177,18 @@
               "keys": ["all"],
               "secrets": ["all"]
             }
+          },
+          {
+              "tenantId":
+                "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
+              "objectId":
+                "4c3fb723-5571-47ec-b6b9-5771946a0338",
+              "permissions": {
+                "secrets":[
+                  "set",
+                  "list"
+                ]
+              }
           }
         ]
       }
