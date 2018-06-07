@@ -48,7 +48,6 @@ Target.create "Artifact" <| fun _ ->
     !! "./deploy/*.*" |> Shell.copyFiles buildDir
     !! "./build/**/*.*" |> Zip.zip buildDir artifactFilename
 
-    let 
     let artifactDirArm = (artifactDir + "/infrastructure/")
     Directory.ensure artifactDirArm
     Shell.copyDir artifactDirArm "infrastructure" (fun f -> not <| f.EndsWith(".azcli"))
