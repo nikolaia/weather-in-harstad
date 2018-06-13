@@ -5,14 +5,14 @@ module Domain =
     type TempProvider =
     | Yr
     | Storm
-    | Bestefar
+    | Sql
     with
         member this.ProviderString =
             match this with
             | Yr -> "Yr"
             | Storm -> "Storm"
-            | Bestefar -> "Bestefar"
-    
+            | Sql -> "Sql"
+   
     type Temp = {
         Provider : TempProvider
         Temp : decimal option

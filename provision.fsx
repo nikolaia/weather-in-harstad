@@ -7,7 +7,7 @@ nuget Fake.DotNet.Cli
 nuget Fake.IO.FileSystem
 nuget Fake.IO.Zip //"
 // Use this for IDE support. Not required by FAKE 5.
-#load ".fake/build.fsx/intellisense.fsx"
+#load ".fake/provision.fsx/intellisense.fsx"
 open Fake.Core
 open Fake.Core.TargetOperators
 open Fake.IO.Globbing.Operators
@@ -20,6 +20,7 @@ let azPath =
     |> function
         | Some az when File.Exists az -> az
         | _ -> failwith "Couldn't find az command on PATH" 
+
 let runAzureCli cmd =
     let result =
         Process.execWithResult(fun psi ->

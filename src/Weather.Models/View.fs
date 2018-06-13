@@ -13,6 +13,6 @@ module View =
                 Provider = match domain.Provider with
                            | Yr -> "Yr"
                            | Storm -> "Storm"
-                           | Bestefar -> "Bestefar"
+                           | Sql -> "Sql"
                 Temp = domain.TempString
             }

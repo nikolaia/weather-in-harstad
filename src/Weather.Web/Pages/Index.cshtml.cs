@@ -51,11 +51,13 @@ namespace Weather.Web.Pages
                 _cache.Set("storm", storm, cacheEntryOptions);
             }
 
+            var sql = Weather.Integrations.Sql.GetForecastHarstad();
+
             Temperatures = new List<View.TempViewModel>
             {
                 View.TempViewModel.Create(yr),
                 View.TempViewModel.Create(storm),
-                new View.TempViewModel("Grandpa", "Nice!")
+                View.TempViewModel.Create(sql) 
             };
 
             Log.Information("Temperatures are @{Temperatures}", Temperatures);
