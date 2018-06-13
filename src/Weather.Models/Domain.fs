@@ -1,7 +1,8 @@
 namespace Weather.Models
 
 module Domain =
-    
+
+
     type TempProvider =
     | Yr
     | Storm

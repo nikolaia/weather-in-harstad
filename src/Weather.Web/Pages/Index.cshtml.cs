@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -15,13 +16,15 @@ namespace Weather.Web.Pages
     {
         private readonly IMemoryCache _cache;
         private readonly IOptions<WeatherOptions> _options;
+        private readonly IConfiguration _configuration;
 
         public IList<View.TempViewModel> Temperatures { get; private set; }
 
-        public IndexModel(IMemoryCache memoryCache, IOptions<WeatherOptions> options)
+        public IndexModel(IMemoryCache memoryCache, IOptions<WeatherOptions> options, IConfiguration configuration)
         {
             this._options = options;
             this._cache = memoryCache;
+            this._configuration = configuration;
         }
         public async Task OnGet()
         {
@@ -51,7 +54,8 @@ namespace Weather.Web.Pages
                 _cache.Set("storm", storm, cacheEntryOptions);
             }
 
-            var sql = Weather.Integrations.Sql.GetForecastHarstad();
+            var connectionString = _configuration.GetConnectionString("WeatherSqlDb");
+            var sql = Weather.Integrations.Sql.GetForecastHarstad(connectionString);
 
             Temperatures = new List<View.TempViewModel>
             {

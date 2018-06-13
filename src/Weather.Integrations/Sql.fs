@@ -17,10 +17,11 @@ module Sql =
             reader.Close()
             con.Close()
         }
-    let GetForecastHarstad() =
+
+    let GetForecastHarstad (connectionString : string) =
 
         let temp = 
-            query @"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;"
+            query connectionString 
             |> Map.ofSeq
             |> Map.tryFind "Temp"
             |> Option.map decimal
