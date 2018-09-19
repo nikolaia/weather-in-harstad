@@ -1,6 +1,6 @@
-# Example app that shows the current weather in Harstad, Norway
+# An example of Immutable application deployments to Azure App Service with F# Make
 
-This is an example app for demonstrating https://github.com/nikolaia/fake-webapp-deploy 
+See the talk about this approach here: https://www.youtube.com/watch?v=_sZT0CpJ6Vo
 
 ## Build, provision and deploy the project to an Azure WebApp
 
