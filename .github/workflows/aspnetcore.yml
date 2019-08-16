@@ -13,5 +13,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
-    - name: Install fake-cli and run build.fsx
-      run: dotnet tool install fake-cli -g --version 5.1.0* && fake run build.fsx
+    - name: Install fake-cli
+      run: dotnet tool install fake-cli --tool-path ./tools --version 5.1.0*
+    - name: Run build.fsx
+      run: ./tools/fake run build.fsx
