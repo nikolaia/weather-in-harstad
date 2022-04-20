@@ -1,6 +1,6 @@
 // Information specific for this solution
 let appName = "Weather"
-let sln = sprintf "%s.sln" appName
+let sln = sprintf "%s.sln" appName // test
 
 // Dependencies and FAKE-specific stuff
 // ==============================================
