@@ -1,7 +1,13 @@
 {
-  "$schema":
-    "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.1124.51302",
+      "templateHash": "16547995315285937327"
+    }
+  },
   "parameters": {
     "webAppName": {
       "type": "string",
@@ -15,26 +21,24 @@
         "description": "The minimum loglevel for Serilog to push"
       }
     }
-  }, 
+  },
   "variables": {
-    "appNameShort": "[substring(parameters('webAppName'),0,5)]",
-    "keyVaultName": "[concat(variables('appNameShort'),'-kv-', uniquestring(resourceGroup().id))]",
-    "sqlServerName": "[concat(variables('appNameShort'),'-sql-', uniquestring(resourceGroup().id))]",
-    "sqlDatabaseName": "[concat(variables('appNameShort'),'-db-', uniquestring(resourceGroup().id))]",
+    "resourceGroupLocation": "[resourceGroup().location]",
+    "appNameShort": "[substring(parameters('webAppName'), 0, 5)]",
+    "keyVaultName_var": "[format('{0}-kv-{1}', variables('appNameShort'), uniqueString(resourceGroup().id))]",
+    "sqlServerName_var": "[format('{0}-sql-{1}', variables('appNameShort'), uniqueString(resourceGroup().id))]",
+    "sqlDatabaseName": "[format('{0}-db-{1}', variables('appNameShort'), uniqueString(resourceGroup().id))]",
     "sqlDatabaseAdminName": "weatherinharstad",
-    "appServicePlanName": "[concat(variables('appNameshort'),'-asp-', uniquestring(resourceGroup().id))]",
-    "sqlserverAdminLogin": "[concat('l', uniqueString(resourceGroup().id, '9A08DDB9-95A1-495F-9263-D89738ED4205'))]",
-    "sqlserverAdminPassword": "[concat('P', uniqueString(resourceGroup().id, '224F5A8B-51DB-46A3-A7C8-59B0DD584A41'), 'x', '!')]"
+    "webappHostingPlanName": "[format('{0}-asp-{1}', variables('appNameShort'), uniqueString(resourceGroup().id))]",
+    "sqlserverAdminLogin": "[format('l{0}', uniqueString(resourceGroup().id, '9A08DDB9-95A1-495F-9263-D89738ED4205'))]",
+    "sqlserverAdminPassword": "[format('P{0}x!', uniqueString(resourceGroup().id, '224F5A8B-51DB-46A3-A7C8-59B0DD584A41'))]"
   },
   "resources": [
     {
-      "apiVersion": "2016-03-01",
-      "name": "[variables('appServicePlanName')]",
       "type": "Microsoft.Web/serverfarms",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "name": "[variables('appServicePlanName')]"
-      },
+      "apiVersion": "2021-03-01",
+      "name": "[variables('webappHostingPlanName')]",
+      "location": "[variables('resourceGroupLocation')]",
       "sku": {
         "name": "S1",
         "tier": "Standard",
@@ -44,154 +48,138 @@
       }
     },
     {
+      "type": "Microsoft.Web/sites",
       "apiVersion": "2016-03-01",
       "name": "[parameters('webAppName')]",
-      "type": "Microsoft.Web/sites",
-      "location": "[resourceGroup().location]",
+      "location": "[variables('resourceGroupLocation')]",
       "identity": {
         "type": "SystemAssigned"
       },
       "properties": {
         "name": "[parameters('webAppName')]",
-        "serverFarmId":
-          "[resourceId('Microsoft.Web/serverFarms',variables('appServicePlanName'))]"
-      },
-      "resources": [
-        {
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('webappHostingPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "appSettings": [
+            {
+              "name": "Weather:StormSecretUri",
+              "value": ""
+            },
+            {
+              "name": "Serilog:MinimumLevel:Default",
+              "value": "[parameters('serilogLogLevel')]"
+            }
           ],
-          "name": "appsettings",
-          "properties": {
-            "Weather:StormSecretUri": "",
-            "Serilog:MinimumLevel:Default": "[parameters('serilogLogLevel')]"
-          },
-          "tags": {
-            "displayName": "appSettings"
-          },
-          "type": "config"
-        },
-        {
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
-          ],
-          "name": "connectionstrings",
-          "properties": {
+          "connectionstrings": {
             "WeatherSqlDb": {
               "type": "SQLAzure",
-              "value": "[concat('Data Source=', variables('sqlDatabaseName'), '.database.windows.net,1433;Database=', variables('sqlDatabaseName'))]"
+              "value": "[format('Data Source={0}.database.windows.net,1433;Database={1}', variables('sqlDatabaseName'), variables('sqlDatabaseName'))]"
             }
-          },
-          "type": "config"
-        } 
-      ],
+          }
+        }
+      },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverFarms/',variables('appServicePlanName'))]",
-        "[resourceId('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName_var'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('webappHostingPlanName'))]"
       ]
     },
     {
-      "name": "[variables('sqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "location": "[resourceGroup().location]",
       "apiVersion": "2014-04-01-preview",
+      "name": "[variables('sqlServerName_var')]",
+      "location": "[variables('resourceGroupLocation')]",
       "properties": {
         "administratorLogin": "[variables('sqlserverAdminLogin')]",
         "administratorLoginPassword": "[variables('sqlserverAdminPassword')]"
-      }, 
-      "dependsOn": [],
+      },
       "tags": {
         "displayName": "SQL Server"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallrules",
+      "apiVersion": "2014-04-01-preview",
+      "name": "[format('{0}/{1}', variables('sqlServerName_var'), 'AllowAllWindowsAzureIps')]",
+      "location": "[variables('resourceGroupLocation')]",
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "0.0.0.0"
       },
-      "resources": [
-        {
-          "name": "AllowAllWindowsAzureIps",
-          "type": "firewallrules",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
-          ],
-          "properties": {
-            "startIpAddress": "0.0.0.0",
-            "endIpAddress": "0.0.0.0"
-          }
-        },
-        {
-          "name": "[variables('sqlDatabaseName')]",
-          "type": "databases",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
-          ],
-          "properties": {
-            "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "edition": "Standard",
-            "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "S0"
-          }
-        },
-        {
-          "type": "administrators",
-          "name": "activeDirectory",
-          "apiVersion": "2014-04-01-preview",
-          "location": "[resourceGroup().location]",
-          "properties": {
-              "administratorType": "ActiveDirectory",
-              "login": "[variables('sqlDatabaseAdminName')]",
-              "sid": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
-              "tenantId": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]"
-          },
-          "dependsOn": [
-              "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]",
-              "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
-          ]
-        }
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName_var'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2014-04-01-preview",
+      "name": "[format('{0}/{1}', variables('sqlServerName_var'), format('{0}', variables('sqlDatabaseName')))]",
+      "location": "[variables('resourceGroupLocation')]",
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "edition": "Standard",
+        "maxSizeBytes": "1073741824",
+        "requestedServiceObjectiveName": "S0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName_var'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/administrators",
+      "apiVersion": "2014-04-01-preview",
+      "name": "[format('{0}/{1}', variables('sqlServerName_var'), 'activeDirectory')]",
+      "location": "[variables('resourceGroupLocation')]",
+      "properties": {
+        "administratorType": "ActiveDirectory",
+        "login": "[variables('sqlDatabaseAdminName')]",
+        "sid": "[reference(format('Microsoft.Web/sites/{0}', parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
+        "tenantId": "[reference(format('Microsoft.Web/sites/{0}', parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName_var'))]",
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
       ]
     },
     {
       "type": "Microsoft.KeyVault/vaults",
-      "name": "[variables('keyVaultName')]",
       "apiVersion": "2015-06-01",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
-      ],
+      "name": "[variables('keyVaultName_var')]",
+      "location": "[variables('resourceGroupLocation')]",
       "properties": {
         "sku": {
           "name": "standard",
           "family": "A"
         },
-        "tenantId":
-          "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
+        "tenantId": "[reference(format('Microsoft.Web/sites/{0}', parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
         "accessPolicies": [
           {
-            "tenantId":
-              "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
-            "objectId":
-              "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
+            "tenantId": "[reference(format('Microsoft.Web/sites/{0}', parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
+            "objectId": "[reference(format('Microsoft.Web/sites/{0}', parameters('webAppName')), '2016-03-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": ["all"],
-              "secrets": ["all"]
+              "keys": [
+                "all"
+              ],
+              "secrets": [
+                "all"
+              ]
             }
           },
           {
-              "tenantId":
-                "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
-              "objectId":
-                "4c3fb723-5571-47ec-b6b9-5771946a0338",
-              "permissions": {
-                "secrets":[
-                  "set",
-                  "list"
-                ]
-              }
+            "tenantId": "[reference(format('Microsoft.Web/sites/{0}', parameters('webAppName')), '2016-03-01', 'Full').identity.tenantId]",
+            "objectId": "4c3fb723-5571-47ec-b6b9-5771946a0338",
+            "permissions": {
+              "secrets": [
+                "set",
+                "list"
+              ]
+            }
           }
         ]
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
     }
   ]
 }

@@ -1,24 +1,20 @@
 namespace Weather.Models
 
 module Domain =
-
-
-    type TempProvider =
-    | Yr
-    | Storm
-    | Sql
-    with
+    type TemperatureProvider =
+        | Yr
+        | Storm
+        | Sql
         member this.ProviderString =
             match this with
             | Yr -> "Yr"
             | Storm -> "Storm"
             | Sql -> "Sql"
-   
-    type Temp = {
-        Provider : TempProvider
-        Temp : decimal option
-    } with 
-        member this.TempString = 
-            match this.Temp with
+
+    type Temperature =
+        { Provider: TemperatureProvider
+          Temperature: decimal option }
+        member this.TempString =
+            match this.Temperature with
             | Some t -> sprintf "%G°" t
             | None -> "-"
