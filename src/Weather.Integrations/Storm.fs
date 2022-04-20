@@ -1,55 +1,58 @@
 namespace Weather.Integrations
-open Microsoft.Azure.Services.AppAuthentication
-open Microsoft.Azure.KeyVault
-open Serilog
 
 module Storm =
 
+    open System
+    open Azure.Identity
+    open Serilog
+    open Azure.Security.KeyVault.Secrets
     open FSharp.Data
     open Weather.Models.Domain
 
     [<Literal>]
-    let KeySample = "{ \"Key\": \"/C+gxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=\" }"
-        
+    let KeySample =
+        "{ \"Key\": \"/C+gxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=\" }"
+
     type StormKey = JsonProvider<KeySample>
     type StormPlaces = JsonProvider<"./samples/storm_places.json">
     type StormForecast = JsonProvider<"./samples/storm_now-forecast.json">
-    let GetForecast locationQuery (stormSecretUri : string) =
+
+    let public GetForecast locationQuery (secretClient: SecretClient) (stormSecretName: string) =
         async {
-            
-            let kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(fun _ resource _ -> 
-                let azureServiceTokenProvider = new AzureServiceTokenProvider();
-                azureServiceTokenProvider.GetAccessTokenAsync(resource)))
+            Log.Information("Fetching {stormSecretName} with managed identity token", stormSecretName)
 
-            Log.Information("Fetching {stormSecretUri} with MSI token", stormSecretUri)
+            let! authUrlSecret =
+                secretClient.GetSecretAsync(stormSecretName)
+                |> Async.AwaitTask
 
-            let! authUrlSecret = kv.GetSecretAsync(stormSecretUri) |> Async.AwaitTask
+            let! authKey = StormKey.AsyncLoad(authUrlSecret.Value.Value)
 
-            let! authKey = 
-                StormKey.AsyncLoad(authUrlSecret.Value)
-            
-            let urlEncodedKey = authKey.Key |> System.Net.WebUtility.UrlEncode
-            
-            let url = sprintf "http://webapi.stormgeo.com/api/v1/places/?q=%s&auth=%s" locationQuery urlEncodedKey
-                
+            let urlEncodedKey =
+                authKey.Key |> System.Net.WebUtility.UrlEncode
+
+            let url =
+                sprintf "http://webapi.stormgeo.com/api/v1/places/?q=%s&auth=%s" locationQuery urlEncodedKey
+
             let! location = StormPlaces.AsyncLoad(url)
-            
+
             let id =
                 location.Places
                 |> Seq.head
                 |> fun place -> place.PlaceId
-            
+
             let urlForecast =
-                sprintf "http://webapi.stormgeo.com/api/v1/now-forecast/%i?auth=%s" id urlEncodedKey
-            
+                $"http://webapi.stormgeo.com/api/v1/now-forecast/%i{id}?auth=%s{urlEncodedKey}"
+
             let! forecast = StormForecast.AsyncLoad urlForecast
-            
-            return {
-                Provider = Storm
-                Temp = forecast.CurrentForecast
-                       |> Seq.tryHead
-                       |> function
-                            | Some f -> Some f.Temperature
-                            | None -> None }
-                
-        } |> Async.StartAsTask
+
+            return
+                { Provider = Storm
+                  Temperature =
+                      forecast.CurrentForecast
+                      |> Seq.tryHead
+                      |> function
+                          | Some f -> Some f.Temperature
+                          | None -> None }
+
+        }
+        |> Async.StartAsTask

@@ -1,0 +1,37 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    if: github.ref == 'refs/heads/main
+    runs-on: ubuntu-latest
+    steps:
+    # checkout the repo
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@master
+
+    # Add Github secret AZURE_CREDENTIALS with entire json object
+    # az deployment group show -g <resource-group-name> -n <deployment-name>
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # From the ACR -> Access Keys Admin user (for demo purposes)
+    - uses: azure/docker-login@v1
+      with:
+        login-server: weathacrzzpsax3wc3np2.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - run: |
+        docker build . -t weathacrzzpsax3wc3np2.azurecr.io/weatherinharstad:${{ github.sha }}
+        docker push weathacrzzpsax3wc3np2.azurecr.io/weatherinharstad:${{ github.sha }} 
+
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'weather-in-harstad'
+        images: 'weathacrzzpsax3wc3np2.azurecr.io/weatherinharstad:${{ github.sha }}'

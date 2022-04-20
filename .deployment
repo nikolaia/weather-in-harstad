@@ -1,2 +1,0 @@
-[config]
-command = dotnet tool install fake-cli -g --version 5.1.0* & D:\local\UserProfile\.dotnet\tools\fake run deploy.fsx stageFolder=app/

@@ -4,11 +4,11 @@ module View =
     
     open Domain
     
-    type TempViewModel = {
+    type TemperatureViewModel = {
         Provider : string
         Temp : string
     } with
-        static member Create (domain : Temp) =
+        static member Create (domain : Temperature) =
             {
                 Provider = match domain.Provider with
                            | Yr -> "Yr"

@@ -18,14 +18,14 @@ module Sql =
             con.Close()
         }
 
-    let GetForecastHarstad (connectionString : string) =
+    let public GetForecastHarstad (connectionString : string) =
 
-        let temp = 
+        let temperature = 
             query connectionString 
             |> Map.ofSeq
             |> Map.tryFind "Temp"
             |> Option.map decimal
                         
         { Provider = Sql
-          Temp = temp }
+          Temperature = temperature }
         
