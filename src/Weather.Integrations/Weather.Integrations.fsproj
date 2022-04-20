@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Storm.fs" />
     <Compile Include="Yr.fs" />
     <Compile Include="Sql.fs" />
+    <Content Include="samples\yr_forecast.xml" />
+    <Content Include="samples\storm_places.json" />
+    <Content Include="samples\storm_now-forecast.json" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.6.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.3.0" />
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="FSharp.Data" Version="3.0.0-beta3" />
-    <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.1" />
-    <PackageReference Include="Serilog" Version="2.7.1" />
-    <PackageReference Include="System.Data.Sqlclient" Version="4.5.0" />
+    <PackageReference Include="FSharp.Data" Version="4.2.8" />
+    <PackageReference Include="Serilog" Version="2.11.0-dev-01380" />
+    <PackageReference Include="System.Data.Sqlclient" Version="4.8.3" />
+    <PackageReference Remove="FSharp.Core" />
+    <PackageReference Update="FSharp.Core" Version="6.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Weather.Models\Weather.Models.fsproj" />
