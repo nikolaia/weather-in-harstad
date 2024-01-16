@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.1" />
     <PackageReference Include="Serilog" Version="2.7.1" />
-    <PackageReference Include="System.Data.Sqlclient" Version="4.5.0" />
+    <PackageReference Include="System.Data.Sqlclient" Version="4.8.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Weather.Models\Weather.Models.fsproj" />
